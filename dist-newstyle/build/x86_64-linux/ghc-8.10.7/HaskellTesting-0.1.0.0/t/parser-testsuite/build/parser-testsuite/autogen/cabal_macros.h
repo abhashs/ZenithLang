@@ -20,6 +20,16 @@
   (major1) == 0 && (major2) <  1 || \
   (major1) == 0 && (major2) == 1 && (minor) <= 0)
 #endif /* MIN_VERSION_HaskellTesting */
+/* package HaskellTesting-0.1.0.0 */
+#ifndef VERSION_HaskellTesting
+#define VERSION_HaskellTesting "0.1.0.0"
+#endif /* VERSION_HaskellTesting */
+#ifndef MIN_VERSION_HaskellTesting
+#define MIN_VERSION_HaskellTesting(major1,major2,minor) (\
+  (major1) <  0 || \
+  (major1) == 0 && (major2) <  1 || \
+  (major1) == 0 && (major2) == 1 && (minor) <= 0)
+#endif /* MIN_VERSION_HaskellTesting */
 /* package base-4.14.3.0 */
 #ifndef VERSION_base
 #define VERSION_base "4.14.3.0"

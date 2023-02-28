@@ -21,13 +21,13 @@ import Data.Function ((&))
 
 type Parser = Parsec Void Text
 
-data Expression
-    = IntegerLiteral Int
-    | BooleanLiteral Bool
-    | StringLiteral Text
-    | Identifier Text
-    | FnApplication Expression [Expression]
-    deriving (Eq, Show)
+-- data Expression
+--     = IntegerLiteral Int
+--     | BooleanLiteral Bool
+--     | StringLiteral Text
+--     | Identifier Text
+--     | FnApplication Expression [Expression]
+--     deriving (Eq, Show)
 
 data Literal
     = IntLiteral Int
@@ -177,30 +177,30 @@ keyword = void (
 -- binFn :: Parser Tex
 -- binFn = stringParse "+" <|> stringParse "-" <|> stringParse "*" <|> stringParse "/"
 
-boolean :: Parser Expression
-boolean =
-    (trueParser >> return (BooleanLiteral True)) <|>
-    (falseParser >> return (BooleanLiteral False))
-      where
-        trueParser = stringParse "True"
-        falseParser = stringParse "False"
+-- boolean :: Parser Expression
+-- boolean =
+--     (trueParser >> return (BooleanLiteral True)) <|>
+--     (falseParser >> return (BooleanLiteral False))
+--       where
+--         trueParser = stringParse "True"
+--         falseParser = stringParse "False"
 
-number :: Parser Expression
-number = do
-    x <- some digitChar
-    return $ IntegerLiteral $ read x
+-- number :: Parser Expression
+-- number = do
+--     x <- some digitChar
+--     return $ IntegerLiteral $ read x
 
 escapedChars :: Parser Char
 escapedChars = do
     char '\\'
     oneOf "\\\""
 
-stringParser :: Parser Expression
-stringParser = do
-    char '"'
-    x <- many $ escapedChars <|> noneOf "\"\\"
-    char '"'
-    return $ StringLiteral $ pack x
+-- stringParser :: Parser Expression
+-- stringParser = do
+--     char '"'
+--     x <- many $ escapedChars <|> noneOf "\"\\"
+--     char '"'
+--     return $ StringLiteral $ pack x
 
 -- identifier :: Parser Expression
 -- identifier = do

@@ -6,10 +6,10 @@ import Test.Hspec.Megaparsec
 -- import Parser
 import ZenithParser
 import Text.Megaparsec (parse)
-import Text.Megaparsec.Debug (dbg)
+-- import Text.Megaparsec.Debug (dbg)
 
 parserSpec :: Spec
-parserSpec = describe "Parser" $ do
+parserSpec = parallel $ describe "Parser" $ do
     context "when parsing whitespace and comments" $ do
         it "shoudld parse a comment" $
             parse comment "" "--comment" `shouldParse` ()
@@ -20,25 +20,25 @@ parserSpec = describe "Parser" $ do
 
     context "when parsing booleans" $ do
         it "should parse True" $
-            parse boolean "" "True" `shouldParse` BooleanLiteral True
+            parse literal "" "True" `shouldParse` BoolLiteral True
         it "should parse False" $
-            parse boolean "" "False" `shouldParse` BooleanLiteral False
+            parse literal "" "False" `shouldParse` BoolLiteral False
 
     context "when parsing strings" $ do
         it "should parse an empty string" $
-            parse stringParser "" "\"\"" `shouldParse` StringLiteral ""
+            parse literal "" "\"\"" `shouldParse` StrLiteral ""
         it "should parse an arbitrary string" $
-            parse stringParser "" "\"arbitrary\"" `shouldParse` StringLiteral "arbitrary"
+            parse literal "" "\"arbitrary\"" `shouldParse` StrLiteral "arbitrary"
         it "should parse an alphanumeric string" $
-            parse stringParser "" "\"ab123\"" `shouldParse` StringLiteral "ab123"
+            parse literal "" "\"ab123\"" `shouldParse` StrLiteral "ab123"
         -- it "should parse an escaped characters" $
         --     parse stringParser "" "\"\\\"" `shouldParse` StringLiteral "\"\\\""
 
     context "when parsing numbers" $ do
         it "should parse a digit" $
-            parse number"" "1" `shouldParse` IntegerLiteral 1
+            parse literal "" "1" `shouldParse` IntLiteral 1
         it "should parse multiple digits" $
-            parse number"" "10" `shouldParse` IntegerLiteral 10
+            parse literal "" "10" `shouldParse` IntLiteral 10
 
 
     context "when parsing identifiers" $ do
@@ -152,18 +152,6 @@ parserSpec = describe "Parser" $ do
                     , ValueDefinition (TypeAnnotation "z" StringT)
                     , ValueDefinition (NameDefinition "z" [] (LitExpr (StrLiteral "foo")))]
 
-
-
-
-    -- context "when parsing function application" $ do
-    --     it "should parse a unary function" $
-    --         parse functionApplication "" "foo 1 " `shouldParse` FnApplication (Identifier "foo") [IntegerLiteral 1]
-    --     it "should parse a binary function" $
-    --         parse functionApplication "" "foo a b" `shouldParse` FnApplication (Identifier "foo") [Identifier "a", Identifier "b"]
-        -- it "should parse a triary function" $
-        --     parse functionApplication "" "foo a b _c" `shouldParse` FnApplication (Identifier "foo") [Identifier "a", Identifier "b", Identifier "_c"]
-        -- it "should parse a higher order function" $
-       --     parse functionApplication "" "foo fn a" `shouldParse` FnApplication (Identifier "foo") [FnApplication (Identifier "fn") [Identifier "a"]]
 
 main :: IO ()
 main = hspec parserSpec
