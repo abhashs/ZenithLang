@@ -19,73 +19,9 @@ import qualified Text.Megaparsec.Char.Lexer as L
 import Data.Maybe (fromMaybe)
 import Data.Function ((&))
 
+import AstTypes
+
 type Parser = Parsec Void Text
-
--- data Expression
---     = IntegerLiteral Int
---     | BooleanLiteral Bool
---     | StringLiteral Text
---     | Identifier Text
---     | FnApplication Expression [Expression]
---     deriving (Eq, Show)
-
-data Literal
-    = IntLiteral Int
-    | StrLiteral Text
-    | BoolLiteral Bool
-    deriving (Eq, Ord, Show)
-
-data Expr
-    = LitExpr Literal
-    | IdentifierExpr Text
-    | IfExpr Expr Expr Expr
-    | ApplyExpr Expr [Expr]
-    | NegateExpr Expr
-    | BinExpr BinOp Expr Expr
-    | LambdaExpr [Text] Expr
-    | CaseExpr Expr [(Pattern, Expr)]
-    deriving (Eq, Show)
-
-data BinOp =
-    Add | Sub | Mul | Div | Dollar | Compose | And | Or |
-    Less | LessEqual | Greater | GreaterEqual | EqualTo |
-    NotEqualTo
-    deriving (Eq, Show)
-
-data Pattern
-    = WildcardPattern
-    | NamePattern Text
-    | LiteralPattern Literal
-    | ConstructorPattern Text [Pattern]
-    deriving (Eq, Show)
-
-infixr 2 :->
-data Type
-    = StringT
-    | IntT
-    | BoolT
-    | CustomType Text [Type]
-    | TVar Text
-    | Type :-> Type
-    deriving (Eq, Show)
-
-data Definition
-    = ValueDefinition ValueDefinition
-    | DataDefinition Text [Text] [ConstructorDefinition]
-    | TypeSynonym Text Type
-    deriving (Eq, Show)
-
-data ConstructorDefinition
-    = ConstructorDefinition Text [Type]
-    deriving (Eq, Show)
-
-data ValueDefinition
-    = TypeAnnotation Text Type
-    | NameDefinition Text [Pattern] Expr
-    deriving (Eq, Show)
-
-newtype AST = AST [Definition] deriving (Eq, Show)
-
 
 --Utility
 stringParse :: String -> Parser Text
@@ -492,7 +428,10 @@ definitions :: Parser [Definition]
 definitions = sepBy1 definition endOfLine
 
 ast :: Parser AST
-ast = fmap AST definitions
+ast = fmap (\d -> AST {
+    functions = d
+    }) definitions
+-- ast = fmap AST definitions
 
 -- spaceOrComment :: Parser ()
 -- spaceOrComment = L.space space1 (L.skipLineComment $ pack "--") (L.skipBlockComment (pack "{-") (pack "-}"))

@@ -1,0 +1,88 @@
+cabal-version:      2.4
+name:               Zenith
+version:            0.1.0.0
+author:             abhashs
+maintainer:         abhashshrestha@outlook.com
+
+-- A copyright notice.
+-- copyright:
+-- category:
+extra-source-files: CHANGELOG.md
+
+--library ZenithParser
+--    default-language: Haskell2010
+--    hs-source-dirs: src
+--    exposed-modules: ZenithParser
+--    build-depends:  base ^>=4.14.3.0
+--                    , megaparsec
+--                    , parser-combinators
+--                    , text
+--                    , AstTypes
+--
+--library Renderer
+--    default-language: Haskell2010
+--    hs-source-dirs: src
+--    exposed-modules: Renderer
+--    build-depends:  base ^>=4.14.3.0
+--                    , megaparsec
+--                    , parser-combinators
+--                    , text
+--                    , AstTypes
+
+library
+    default-language: Haskell2010
+    hs-source-dirs: src
+    exposed-modules: ZenithParser, Renderer, AstTypes, Simplifier, Typer
+    build-depends:  base ^>=4.14.3.0
+                    , megaparsec
+                    , parser-combinators
+                    , text
+                    , containers
+                    , mtl
+                    , pretty
+    
+
+executable haskellTesting
+    main-is:        Main.hs
+    hs-source-dirs: executable
+    default-language: Haskell2010
+    build-depends:  base ^>=4.14.3.0
+                    , megaparsec
+                    , Zenith
+                    , text
+                    , containers
+
+-- test-suite parser-testsuite
+--     type:           exitcode-stdio-1.0
+--     hs-source-dirs: test
+--     main-is:        Main.hs
+--     default-language: Haskell2010
+--     ghc-options:    -Wall
+--                     -threaded
+--     build-depends:  base
+--                     , megaparsec
+--                     , Parser
+--                     , Renderer
+--                     , hspec
+--                     , hspec-megaparsec
+
+
+test-suite spec
+    type:           exitcode-stdio-1.0
+    hs-source-dirs: test
+    main-is:        Spec.hs
+    default-language: Haskell2010
+    ghc-options:    -Wall
+                    -threaded
+    build-tool-depends: hspec-discover:hspec-discover == 2.*
+    other-modules:  ZenithParserSpec
+                    , RendererSpec
+                    , SimplifierSpec
+                    , TyperSpec
+    build-depends:  base
+                    , megaparsec
+                    , Zenith
+                    , text
+                    , hspec
+                    , hspec-megaparsec
+                    , containers

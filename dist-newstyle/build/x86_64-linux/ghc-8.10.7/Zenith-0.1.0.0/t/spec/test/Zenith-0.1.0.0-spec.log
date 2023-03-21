@@ -1,0 +1,99 @@
+Test suite spec: RUNNING...
+
+Renderer
+  Renderer
+    when renderering literals
+      should render a number literal [✔]
+      should render a string literal [✔]
+      should render a boolean literal [✔]
+    when renderering expressions
+      should render an identifier [✔]
+      should render an if expression [✔]
+      should render an expression application [✔]
+      should render a curried expression appplication [✔]
+      should render a negation expression [✔]
+      should render a binary expression [✔]
+      should render a lambda expression [✔]
+      should render nested expressions [✔]
+    when renderering definitions
+      should render a variable definition [✔]
+      should render a function definition [✔]
+    when renderering asts
+      should render a simple ast [✔]
+      should render multiple definitions [✔]
+Simplifier
+  Simplifier
+    when simplifying expressions
+      should reflect a literal expression [✔]
+      should reflect an identifier expression [✔]
+      should reflect a basic if expression [✔]
+      should reflect single expression application [✔]
+      should simplify multiple expression application [✔]
+      should reflect a lambda expression [✔]
+      should reflect nested expressions [✔]
+    when simplifying definitions
+      should reflect a ValueDefinitiion [✔]
+    when simplifying ASTs
+      should reflect an AST [✔]
+Typer
+  Typer
+    when type inferring
+      should type infer a number literal [✔]
+ZenithParser
+  Parser
+    when parsing whitespace and comments
+      shoudld parse a comment [✔]
+      should parse a block comment [✔]
+      should parse an indented newline [✔]
+    when parsing booleans
+      should parse True [✔]
+      should parse False [✔]
+    when parsing strings
+      should parse an empty string [✔]
+      should parse an arbitrary string [✔]
+      should parse an alphanumeric string [✔]
+    when parsing numbers
+      should parse a digit [✔]
+      should parse multiple digits [✔]
+    when parsing identifiers
+      should parse a letter [✔]
+      should parse a word [✔]
+      should parse alphanumeric [✔]
+      should parse underscores [✔]
+      should not parse keywords [✔]
+    when parsing atoms
+      should parse a number [✔]
+      should parse a boolean [✔]
+      should parse a string [✔]
+      should parse an identifier [✔]
+      should parse parentheses [✔]
+    when parsing expressions
+      should parse an atomic expression [✔]
+      should parse an parenesed expression [✔]
+      should parse a negative unary expression [✔]
+      should parse function application [✔]
+      should parse multiple function application [✔]
+      should parse a dollar binary function [✔]
+      should parse a addition binary function [✔]
+      should parse a division binary function [✔]
+      should parse multiple binary functions [✔]
+      should parse if expressions [✔]
+      should parse complex if expressions [✔]
+      should parse lambda expressions [✔]
+      should parse lambda expressions with multiple args [✔]
+      should parse complex expressions [✔]
+    when parsing types
+      should parse primitive types [✔]
+      should parse a function type [✔]
+      should parse a function type with type variables [✔]
+      should parse a type expression [✔]
+    when parsing definitions
+      should parse a 2 argument function type annotation [✔]
+      should parse a basic definition [✔]
+      should parse multiple definitions [✔]
+      should parse multiple complex definitions [✔]
+
+Finished in 0.0367 seconds
+67 examples, 0 failures
+Test suite spec: PASS
+Test suite logged to: /home/abhash/Projects/HaskellTesting/dist-newstyle/build/x86_64-linux/ghc-8.10.7/Zenith-0.1.0.0/t/spec/test/Zenith-0.1.0.0-spec.log
