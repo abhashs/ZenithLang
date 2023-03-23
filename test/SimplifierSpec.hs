@@ -48,6 +48,28 @@ spec = parallel $ describe "Simplifier" $ do
                 LambdaExpr ["x"]
                     (LambdaExpr ["y"] 
                         (LambdaExpr ["z"] (IdentifierExpr "x")))
+        it "should reflect let expressions with one definition" $
+            simplifyExpr (LetExpr 
+                [ValueDefinition (NameDefinition "x" [] (IdentifierExpr "y"))]
+                (IdentifierExpr "x"))
+                `shouldBe`
+                LetExpr 
+                    [ValueDefinition (NameDefinition "x" [] (IdentifierExpr "y"))]
+                    (IdentifierExpr "x")
+        it "should simplify let expressions with multiple definitions" $
+            simplifyExpr (LetExpr 
+                [ ValueDefinition (NameDefinition "x" [] (IdentifierExpr "y"))
+                , ValueDefinition (NameDefinition "z" [] (IdentifierExpr "a"))]
+                (IdentifierExpr "x"))
+                `shouldBe`
+                LetExpr
+                    [ValueDefinition (NameDefinition "x" [] (IdentifierExpr "y"))]
+                    (LetExpr
+                        [ValueDefinition (NameDefinition "z" [] (IdentifierExpr "a"))]
+                        (IdentifierExpr "x"))
+
+                
+
         it "should reflect nested expressions" $
             simplifyExpr (IfExpr
                             (BinExpr EqualTo

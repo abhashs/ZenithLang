@@ -34,6 +34,8 @@ Simplifier
       should reflect a lambda expression with one arg [✔]
       should simplify a lambda expression with 2 args [✔]
       should simplify a lambda expression with 3 or more args [✔]
+      should reflect let expressions with one definition [✔]
+      should simplify let expressions with multiple definitions [✔]
       should reflect nested expressions [✔]
     when simplifying definitions
       should reflect a ValueDefinitiion [✔]
@@ -90,9 +92,6 @@ ZenithParser
       should parse multiple binary functions [✔]
       should parse if expressions [✔]
       should parse complex if expressions [✔]
-      should parse lambda expressions [✔]
-      should parse lambda expressions with multiple args [✔]
-      should parse complex expressions [✔]
     when parsing types
       should parse primitive types [✔]
       should parse a function type [✔]
@@ -105,6 +104,6 @@ ZenithParser
       should parse multiple complex definitions [✔]
 
 Finished in 0.0383 seconds
-78 examples, 0 failures
+77 examples, 0 failures
 Test suite spec: PASS
 Test suite logged to: /home/abhash/Projects/HaskellTesting/dist-newstyle/build/x86_64-linux/ghc-8.10.7/Zenith-0.1.0.0/t/spec/test/Zenith-0.1.0.0-spec.log

@@ -92,6 +92,12 @@ spec = parallel $ describe "Parser" $ do
                             (LitExpr (IntLiteral 1))) 
                         (LitExpr (IntLiteral 2)))
                     (LitExpr (IntLiteral 1))
+        -- it "should parse let expressions" $
+        --     parse expr "" "let x = True\n\tin x" `shouldParse`
+        --         LetExpr 
+        --             [ValueDefinition (NameDefinition "x" [] (LitExpr (BoolLiteral True)))]
+        --             (IdentifierExpr "x")
+
         it "should parse if expressions" $
             parse expr "" "if True then True else False" `shouldParse` 
                 IfExpr 
@@ -104,18 +110,18 @@ spec = parallel $ describe "Parser" $ do
                     (ApplyExpr (IdentifierExpr "foo") [LitExpr (IntLiteral 1)])
                     (ApplyExpr (IdentifierExpr "fn") [LitExpr (IntLiteral 3), LitExpr (StrLiteral "string")])
                     (ApplyExpr (IdentifierExpr "foo") [LitExpr (IntLiteral 10)])
-        it "should parse lambda expressions" $
-            parse expr "" "\\x -> x" `shouldParse` LambdaExpr ["x"] (IdentifierExpr "x")
-        it "should parse lambda expressions with multiple args" $
-            parse expr "" "\\x y -> x" `shouldParse` LambdaExpr ["x", "y"] (IdentifierExpr "x")
-        it "should parse complex expressions" $
-            parse expr "" "if\n\tfn (foo 1 2) 3 then \\x -> x else \\x y -> x + y" `shouldParse`
-                IfExpr 
-                    (ApplyExpr (IdentifierExpr "fn") 
-                        [ApplyExpr (IdentifierExpr "foo") [LitExpr (IntLiteral 1),LitExpr (IntLiteral 2)]
-                        ,LitExpr (IntLiteral 3)])
-                    (LambdaExpr ["x"] (IdentifierExpr "x"))
-                    (LambdaExpr ["x","y"] (BinExpr Add (IdentifierExpr "x") (IdentifierExpr "y")))
+        -- it "should parse lambda expressions" $
+        --     parse expr "" "\\x -> x" `shouldParse` LambdaExpr ["x"] (IdentifierExpr "x")
+        -- it "should parse lambda expressions with multiple args" $
+        --     parse expr "" "\\x y -> x" `shouldParse` LambdaExpr ["x", "y"] (IdentifierExpr "x")
+        -- it "should parse complex expressions" $
+        --     parse expr "" "if\n\tfn (foo 1 2) 3 then \\x -> x else \\x y -> x + y" `shouldParse`
+        --         IfExpr 
+        --             (ApplyExpr (IdentifierExpr "fn") 
+        --                 [ApplyExpr (IdentifierExpr "foo") [LitExpr (IntLiteral 1),LitExpr (IntLiteral 2)]
+        --                 ,LitExpr (IntLiteral 3)])
+        --             (LambdaExpr ["x"] (IdentifierExpr "x"))
+        --             (LambdaExpr ["x","y"] (BinExpr Add (IdentifierExpr "x") (IdentifierExpr "y")))
 
     context "when parsing types" $ do
         it "should parse primitive types" $

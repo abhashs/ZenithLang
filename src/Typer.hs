@@ -164,10 +164,23 @@ typeInfer env exp@(BinExpr op e1 e2) =
 
 -- typeInfer env exp@(LambdaExpr args e) =
 --   do
+--     let env' = foldl remove env args
+--     (s1, t1) <- typeInfer env' e
+--     let t' = generalize (apply s1 env') t1
+--         env'' = TypeEnv (Map.insert (head args) t' env')
+
+--     return (s1, t1)
+
+-- typeInfer env exp@(LambdaExpr args e) =
+--   do
 --     (s1, t1) <- typeInfer env e
---     let TypeEnv env' = remove env x
+--     let TypeEnv env' = foldl remove env args
 --         t' = generalize (apply s1 env) t1
---         env'' = TypeEnv (Map.insert 
+--         env'' = TypeEnv (Map.insert (head args) t' env')
+--     (s2, t2) <-  ti (apply s1 env'') e2
+
+        -- t' = generalize (apply s1 env) t1
+        -- env'' = TypeEnv (Map.insert 
 
 -- typeInfer env exp@(IfExpr b c1 c2) =
 --   do
@@ -177,7 +190,7 @@ typeInfer env exp@(BinExpr op e1 e2) =
 
 
 typeInference :: Map.Map Text Scheme -> Expr -> TI Type
-typeInference env e = 
+typeInference env e =
   do
     (s, t) <- typeInfer (TypeEnv env) e
     return (apply s t)

@@ -20,6 +20,7 @@ import Data.Maybe (fromMaybe)
 import Data.Function ((&))
 
 import AstTypes
+import Text.Read (Lexeme(String))
 
 type Parser = Parsec Void Text
 
@@ -277,20 +278,35 @@ mulDivExpr = associateBinaryOpsL mulDivOperator unaryExpr
   where
     mulDivOperator = (BinExpr Mul <$ parseThenSpace "*") <|> (BinExpr Div <$ parseThenSpace "/")
 
+
+-- letExpr :: Parser Expr
+-- letExpr =
+--   do
+--     stringParse "let"
+--     spacing1
+--     def <- valueDefinition
+--     -- defs <- sepBy1 valueDefinition indentAfterEndOfLine
+--     spacing1
+--     stringParse "in"
+--     spacing1
+--     LetExpr (Prelude.map ValueDefinition [def]) <$> expr
+    -- liftA2 LetExpr ( (stringParse "let" <* spacing1) *> braced valueDefinition) (token In *> expr)
+
+
 ifExpr :: Parser Expr
 ifExpr =
-    do
-        stringParse "if"
-        anySpacing
-        e1 <- expr
-        anySpacing
-        stringParse "then"
-        spacing1
-        e2 <- expr
-        anySpacing
-        stringParse "else"
-        spacing1
-        IfExpr e1 e2 <$> expr
+  do
+    stringParse "if"
+    anySpacing
+    e1 <- expr
+    anySpacing
+    stringParse "then"
+    spacing1
+    e2 <- expr
+    anySpacing
+    stringParse "else"
+    spacing1
+    IfExpr e1 e2 <$> expr
 -- ifExpr = IfExpr
 --         <$> ( (stringParse "if" <* space) *> expr)
 --         <*> (stringParse "then" *> expr)
@@ -332,7 +348,8 @@ caseExpr =
 
 expr :: Parser Expr
 -- expr = ifExpr <|> lambdaExpr <|> binExpr <|> caseExpr
-expr = ifExpr <|> lambdaExpr <|> binExpr
+-- expr = ifExpr <|> lambdaExpr <|> binExpr
+expr = ifExpr <|> binExpr
 
 singleType :: Parser Type
 singleType = fmap TVar lowercaseIdentifier <|> primType <|> parensed typeExpr

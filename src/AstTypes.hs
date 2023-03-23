@@ -10,6 +10,7 @@ data Literal
 data Expr
     = LitExpr Literal
     | IdentifierExpr Text
+    | LetExpr [Definition] Expr
     | IfExpr Expr Expr Expr
     | ApplyExpr Expr [Expr]
     | NegateExpr Expr
