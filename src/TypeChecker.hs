@@ -103,16 +103,16 @@ varBind u t | t == TVar u           = return nullSub
             | otherwise             = return (u |-> t)
 
 
-mostGeneralUnify :: (Monad m, MonadFail m) => Type -> Type -> m Substitution
-mostGeneralUnify (l :-> r) (l' :-> r') = do
-    s1 <- mostGeneralUnify l' r'
-    s2 <- mostGeneralUnify (apply s1 r) (apply s1 r')
+mgu :: (Monad m, MonadFail m) => Type -> Type -> m Substitution
+mgu (l :-> r) (l' :-> r') = do
+    s1 <- mgu l' r'
+    s2 <- mgu (apply s1 r) (apply s1 r')
     return (s2 @@ s1)
-mostGeneralUnify (TVar u) t            = varBind u t
-mostGeneralUnify t (TVar u)            = varBind u t
-mostGeneralUnify (TCon tc1) (TCon tc2)
+mgu (TVar u) t            = varBind u t
+mgu t (TVar u)            = varBind u t
+mgu (TCon tc1) (TCon tc2)
     | tc1 == tc2                       = return nullSub
-mostGeneralUnify t1 t2                 = fail "types do not unify"
+mgu t1 t2                 = fail "types do not unify"
 
 match :: (Monad m, MonadFail m) => Type -> Type -> m Substitution
 match (l :-> r) (l' :-> r')         = do sl <- match l l'
@@ -122,3 +122,11 @@ match (TVar u) t | kind u == kind t = return (u |-> t)
 match (TCon tc1) (TCon tc2)
                  | tc1 == tc2       = return nullSub
 match t1 t2                         = fail "types do not match"
+
+
+--------------------------------------------------------------------------------
+-- Type Schemes
+--------------------------------------------------------------------------------
+
+
+

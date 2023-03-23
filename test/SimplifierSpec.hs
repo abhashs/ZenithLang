@@ -16,9 +16,14 @@ spec = parallel $ describe "Simplifier" $ do
         it "should reflect an identifier expression" $
             simplifyExpr (IdentifierExpr "x")
                 `shouldBe` IdentifierExpr "x"
-        it "should reflect a basic if expression" $
+        it "should simplify a basic if expression" $
             simplifyExpr (IfExpr (IdentifierExpr "x") (IdentifierExpr "y") (IdentifierExpr "z"))
-                `shouldBe` IfExpr (IdentifierExpr "x") (IdentifierExpr "y") (IdentifierExpr "z")
+                `shouldBe` 
+                ApplyExpr
+                    (ApplyExpr 
+                        (ApplyExpr (IdentifierExpr "cond") [IdentifierExpr "x"])
+                        [IdentifierExpr "y"])
+                    [IdentifierExpr "z"]
         it "should reflect single expression application" $
             simplifyExpr (ApplyExpr (IdentifierExpr "x") [LitExpr (IntLiteral 1)])
                 `shouldBe` ApplyExpr (IdentifierExpr "x") [LitExpr (IntLiteral 1)]
@@ -28,12 +33,21 @@ spec = parallel $ describe "Simplifier" $ do
                 , LitExpr (IntLiteral 2)
                 ])
                 `shouldBe`
-                ApplyExpr
+                ApplyExpr 
                     (ApplyExpr (IdentifierExpr "x") [LitExpr (IntLiteral 1)])
                     [LitExpr (IntLiteral 2)]
-        it "should reflect a lambda expression" $
+        it "should reflect a lambda expression with one arg" $
             simplifyExpr (LambdaExpr ["x"] (IdentifierExpr "x"))
                 `shouldBe` LambdaExpr ["x"] (IdentifierExpr "x")
+        it "should simplify a lambda expression with 2 args" $
+            simplifyExpr (LambdaExpr ["x", "y"] (IdentifierExpr "x"))
+                `shouldBe` LambdaExpr ["x"] (LambdaExpr ["y"] (IdentifierExpr "x"))
+        it "should simplify a lambda expression with 3 or more args" $
+            simplifyExpr (LambdaExpr ["x", "y", "z"] (IdentifierExpr "x"))
+                `shouldBe` 
+                LambdaExpr ["x"]
+                    (LambdaExpr ["y"] 
+                        (LambdaExpr ["z"] (IdentifierExpr "x")))
         it "should reflect nested expressions" $
             simplifyExpr (IfExpr
                             (BinExpr EqualTo
@@ -44,16 +58,18 @@ spec = parallel $ describe "Simplifier" $ do
                                 (IdentifierExpr "z")
                                 [IdentifierExpr "x", IdentifierExpr "y"]))
                 `shouldBe`
-            simplifyExpr (IfExpr
-                            (BinExpr EqualTo
-                                (IdentifierExpr "x")
-                                (IdentifierExpr "y"))
-                            (LitExpr (IntLiteral 1))
-                            (ApplyExpr
-                                (ApplyExpr 
-                                    (IdentifierExpr "z")
-                                    [IdentifierExpr "x"])
-                                [IdentifierExpr "y"]))
+            ApplyExpr
+                (ApplyExpr 
+                    (ApplyExpr
+                        (IdentifierExpr "cond")
+                        [BinExpr EqualTo
+                            (IdentifierExpr "x")
+                            (IdentifierExpr "y")])
+                    [LitExpr (IntLiteral 1)])
+                [ApplyExpr
+                    (IdentifierExpr "z")
+                    [IdentifierExpr "x", IdentifierExpr "y"]]
+
 
     context "when simplifying definitions" $ do
         it "should reflect a ValueDefinitiion" $

@@ -9,11 +9,13 @@ Renderer
     when renderering expressions
       should render an identifier [✔]
       should render an if expression [✔]
+      should render nested if expression [✔]
       should render an expression application [✔]
       should render a curried expression appplication [✔]
       should render a negation expression [✔]
       should render a binary expression [✔]
       should render a lambda expression [✔]
+      should render a curried lambda expression with multiple args [✔]
       should render nested expressions [✔]
     when renderering definitions
       should render a variable definition [✔]
@@ -26,10 +28,12 @@ Simplifier
     when simplifying expressions
       should reflect a literal expression [✔]
       should reflect an identifier expression [✔]
-      should reflect a basic if expression [✔]
+      should simplify a basic if expression [✔]
       should reflect single expression application [✔]
       should simplify multiple expression application [✔]
-      should reflect a lambda expression [✔]
+      should reflect a lambda expression with one arg [✔]
+      should simplify a lambda expression with 2 args [✔]
+      should simplify a lambda expression with 3 or more args [✔]
       should reflect nested expressions [✔]
     when simplifying definitions
       should reflect a ValueDefinitiion [✔]
@@ -37,8 +41,15 @@ Simplifier
       should reflect an AST [✔]
 Typer
   Typer
-    when type inferring
+    when inferring types
       should type infer a number literal [✔]
+      should type infer a string literal [✔]
+      should not type infer an unbound identifier [✔]
+      should type infer a bound identifier [✔]
+      should type infer (bound) expression application [✔]
+      should not unify incorrect type expression application [✔]
+      should type infer partially applied curried expression application [✔]
+      should type infer a binary operation expression [✔]
 ZenithParser
   Parser
     when parsing whitespace and comments
@@ -93,7 +104,7 @@ ZenithParser
       should parse multiple definitions [✔]
       should parse multiple complex definitions [✔]
 
-Finished in 0.0367 seconds
-67 examples, 0 failures
+Finished in 0.0383 seconds
+78 examples, 0 failures
 Test suite spec: PASS
 Test suite logged to: /home/abhash/Projects/HaskellTesting/dist-newstyle/build/x86_64-linux/ghc-8.10.7/Zenith-0.1.0.0/t/spec/test/Zenith-0.1.0.0-spec.log

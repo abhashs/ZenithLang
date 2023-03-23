@@ -19,17 +19,38 @@ spec = parallel $ describe "Renderer" $ do
 
     context "when renderering expressions" $ do
         it "should render an identifier" $
-            renderExpr (IdentifierExpr "foo") `shouldBe` "foo"
+            renderExpr "" (IdentifierExpr "foo") `shouldBe` "foo"
         it "should render an if expression" $
-            renderExpr
+            renderExpr ""
                 (IfExpr
                     (LitExpr (BoolLiteral True))
                     (LitExpr (IntLiteral 1))
                     (LitExpr (IntLiteral 2)))
             `shouldBe`
-                "if true then 1 else 2 end"
+                "if true then\n\t1\nelse\n\t2\nend"
+        it "should render nested if expression" $
+            renderExpr ""
+                (IfExpr
+                    (IdentifierExpr "a")
+                    (IfExpr (IdentifierExpr "x") (IdentifierExpr "y") (IdentifierExpr "z"))
+                    (IfExpr (IdentifierExpr "y") (IdentifierExpr "b") (IdentifierExpr "c")))
+            `shouldBe`
+                "if a then\n\
+                \\tif x then\n\
+                \\t\ty\n\
+                \\telse\n\
+                \\t\tz\n\
+                \\tend\n\
+                \else\n\
+                \\tif y then\n\
+                \\t\tb\n\
+                \\telse\n\
+                \\t\tc\n\
+                \\tend\n\
+                \end"
+
         it "should render an expression application" $
-            renderExpr
+            renderExpr ""
                 (ApplyExpr (IdentifierExpr "foo")
                     [ LitExpr (BoolLiteral False)
                     , LitExpr (IntLiteral 10)
@@ -37,7 +58,7 @@ spec = parallel $ describe "Renderer" $ do
             `shouldBe`
                 "(foo)(false, 10)"
         it "should render a curried expression appplication" $
-            renderExpr
+            renderExpr ""
                 (ApplyExpr
                     (ApplyExpr (IdentifierExpr "foo")
                         [ LitExpr (BoolLiteral False) ])
@@ -45,19 +66,23 @@ spec = parallel $ describe "Renderer" $ do
             `shouldBe`
                 "((foo)(false))(10)"
         it "should render a negation expression" $
-            renderExpr (NegateExpr (LitExpr (IntLiteral 1))) `shouldBe` "-1"
+            renderExpr "" (NegateExpr (LitExpr (IntLiteral 1))) `shouldBe` "-1"
         it "should render a binary expression" $
-            renderExpr (BinExpr Add
+            renderExpr "" (BinExpr Add
                 (LitExpr (IntLiteral 1))
                 (LitExpr (IntLiteral 11)))
             `shouldBe`
                 "1 + 11"
         it "should render a lambda expression" $
-            renderExpr (LambdaExpr ["x"] (IdentifierExpr "x"))
+            renderExpr "" (LambdaExpr ["x"] (IdentifierExpr "x"))
             `shouldBe`
                 "function(x)\n\tx\nend"
+        it "should render a curried lambda expression with multiple args" $
+            renderExpr "" (LambdaExpr ["x"] (LambdaExpr ["y"] (IdentifierExpr "x")))
+            `shouldBe`
+                "function(x)\n\tfunction(y)\n\t\tx\n\tend\nend"
         it "should render nested expressions" $ do
-            renderExpr
+            renderExpr ""
                 (IfExpr
                     (ApplyExpr (IdentifierExpr "foo")
                         [ LitExpr (BoolLiteral False)
@@ -66,16 +91,16 @@ spec = parallel $ describe "Renderer" $ do
                     (ApplyExpr (LambdaExpr ["x"] (IdentifierExpr "x"))
                         [ LitExpr (BoolLiteral True) ]))
             `shouldBe`
-                "if (foo)(false, 10) then \"bar\" else (function(x)\n\tx\nend)(true) end"
+                "if (foo)(false, 10) then\n\t\"bar\"\nelse\n\t(function(x)\n\tx\nend)(true)\nend"
 
     context "when renderering definitions" $ do
         it "should render a variable definition" $
-            renderDefinition (ValueDefinition
+            renderDefinition "" (ValueDefinition
                 (NameDefinition "x" [] (LitExpr (IntLiteral 1))))
             `shouldBe`
             "local x = 1"
         it "should render a function definition" $
-            renderDefinition (ValueDefinition
+            renderDefinition "" (ValueDefinition
                 (NameDefinition "y" [NamePattern "arg"] (LitExpr (IntLiteral 1))))
             `shouldBe`
             "function y(arg)\n\t1\nend"

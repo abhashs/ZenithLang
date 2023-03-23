@@ -141,6 +141,7 @@ typeInfer (TypeEnv env) (IdentifierExpr n) =
                        return (nullSubst, t)
 typeInfer _ (LitExpr l) = inferLiteral l
 -- TODO: EAbs?
+
 typeInfer env exp@(ApplyExpr e1 e2) =
   do
     tv <- newTyVar "a"
@@ -150,6 +151,29 @@ typeInfer env exp@(ApplyExpr e1 e2) =
     return (s3 `composeSubst` s2 `composeSubst` s1, apply s3 tv)
   `catchError`
   (\e -> throwError $ e <> "\n in " <> pack (show exp))
+
+typeInfer env exp@(BinExpr op e1 e2) =
+  do
+    tv <- newTyVar "a"
+    (s1, t1) <- typeInfer env e1
+    (s2, t2) <- typeInfer env e2
+    s3   <- mgu t1 t2
+    return (s3, t1)
+  `catchError`
+  (\e -> throwError $ e <> "\n in " <> pack (show exp))
+
+-- typeInfer env exp@(LambdaExpr args e) =
+--   do
+--     (s1, t1) <- typeInfer env e
+--     let TypeEnv env' = remove env x
+--         t' = generalize (apply s1 env) t1
+--         env'' = TypeEnv (Map.insert 
+
+-- typeInfer env exp@(IfExpr b c1 c2) =
+--   do
+--     tv <- newTyVar "a"
+--     (s1, t1) <- typeInfer env b
+
 
 
 typeInference :: Map.Map Text Scheme -> Expr -> TI Type
@@ -161,5 +185,9 @@ typeInference env e =
 testTI :: Expr -> IO (Either Text Type)
 testTI t = do (res, _) <- runTI (typeInference Map.empty t)
               return res
+
+testTIWithEnv :: Map.Map Text Scheme -> Expr -> IO (Either Text Type)
+testTIWithEnv env t = do (res, _) <- runTI (typeInference env t)
+                         return res
 
 
