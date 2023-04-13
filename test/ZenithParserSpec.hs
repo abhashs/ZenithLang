@@ -110,18 +110,18 @@ spec = parallel $ describe "Parser" $ do
                     (ApplyExpr (IdentifierExpr "foo") [LitExpr (IntLiteral 1)])
                     (ApplyExpr (IdentifierExpr "fn") [LitExpr (IntLiteral 3), LitExpr (StrLiteral "string")])
                     (ApplyExpr (IdentifierExpr "foo") [LitExpr (IntLiteral 10)])
-        -- it "should parse lambda expressions" $
-        --     parse expr "" "\\x -> x" `shouldParse` LambdaExpr ["x"] (IdentifierExpr "x")
-        -- it "should parse lambda expressions with multiple args" $
-        --     parse expr "" "\\x y -> x" `shouldParse` LambdaExpr ["x", "y"] (IdentifierExpr "x")
-        -- it "should parse complex expressions" $
-        --     parse expr "" "if\n\tfn (foo 1 2) 3 then \\x -> x else \\x y -> x + y" `shouldParse`
-        --         IfExpr 
-        --             (ApplyExpr (IdentifierExpr "fn") 
-        --                 [ApplyExpr (IdentifierExpr "foo") [LitExpr (IntLiteral 1),LitExpr (IntLiteral 2)]
-        --                 ,LitExpr (IntLiteral 3)])
-        --             (LambdaExpr ["x"] (IdentifierExpr "x"))
-        --             (LambdaExpr ["x","y"] (BinExpr Add (IdentifierExpr "x") (IdentifierExpr "y")))
+        it "should parse lambda expressions" $
+            parse expr "" "\\x -> x" `shouldParse` LambdaExpr ["x"] (IdentifierExpr "x")
+        it "should parse lambda expressions with multiple args" $
+            parse expr "" "\\x y -> x" `shouldParse` LambdaExpr ["x", "y"] (IdentifierExpr "x")
+        it "should parse complex expressions" $
+            parse expr "" "if\n\tfn (foo 1 2) 3 then \\x -> x else \\x y -> x + y" `shouldParse`
+                IfExpr 
+                    (ApplyExpr (IdentifierExpr "fn") 
+                        [ApplyExpr (IdentifierExpr "foo") [LitExpr (IntLiteral 1),LitExpr (IntLiteral 2)]
+                        ,LitExpr (IntLiteral 3)])
+                    (LambdaExpr ["x"] (IdentifierExpr "x"))
+                    (LambdaExpr ["x","y"] (BinExpr Add (IdentifierExpr "x") (IdentifierExpr "y")))
 
     context "when parsing types" $ do
         it "should parse primitive types" $
@@ -149,6 +149,11 @@ spec = parallel $ describe "Parser" $ do
                         [ ValueDefinition (TypeAnnotation "x" IntT)
                         , ValueDefinition (NameDefinition "x" [] (LitExpr (IntLiteral 2)))
                         ]
+                    }
+        it "should parse a data definition" $
+            parse ast "" "data X = X Number" `shouldParse`
+                AST { functions =
+                    [ DataDefinition "X" [] [ConstructorDefinition "X" [IntT]]]
                     }
         it "should parse multiple definitions" $
             parse ast "" "x :: Number\nx = 2\ny :: Number\ny = 2" `shouldParse` 

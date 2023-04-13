@@ -51,6 +51,10 @@ renderExpr inden ex = inden <> renderExpr' ex
         <> renderExpr "" b    <> " then" <> nl
         <> renderExpr "\t" c1 <> nl <> "else" <> nl
         <> renderExpr "\t" c2 <> nl <> "end"
+    renderExpr' (LetExpr defs e) = "(function()" <> nl
+        <> intercalate nl (map (renderDefinition "\t") defs) <> nl
+        <> "\treturn (" <> renderExpr "" e <> ")" <> nl
+        <> "end)()"
     renderExpr' (ApplyExpr e args) = "(" <> renderExpr "" e <> ")(" 
         <> intercalate ", " (map (renderExpr "") args) <> ")"
     renderExpr' (NegateExpr e) = "-" <> renderExpr "" e

@@ -48,7 +48,15 @@ spec = parallel $ describe "Renderer" $ do
                 \\t\tc\n\
                 \\tend\n\
                 \end"
-
+        it "should render let expressions" $
+            renderExpr ""
+                (LetExpr
+                    [ ValueDefinition (NameDefinition "x" [] (LitExpr (IntLiteral 1)))
+                    , ValueDefinition (NameDefinition "y" [] (LitExpr (IntLiteral 2)))
+                    ]
+                    (BinExpr Add (IdentifierExpr "x") (IdentifierExpr "y")))
+            `shouldBe`
+                "(function()\n\tlocal x = 1\n\tlocal y = 2\n\treturn (x + y)\nend)()"
         it "should render an expression application" $
             renderExpr ""
                 (ApplyExpr (IdentifierExpr "foo")
@@ -81,15 +89,15 @@ spec = parallel $ describe "Renderer" $ do
             renderExpr "" (LambdaExpr ["x"] (LambdaExpr ["y"] (IdentifierExpr "x")))
             `shouldBe`
                 "function(x)\n\tfunction(y)\n\t\tx\n\tend\nend"
-        it "should render nested expressions" $ do
+        it "should render nested expressions" $ 
             renderExpr ""
-                (IfExpr
-                    (ApplyExpr (IdentifierExpr "foo")
-                        [ LitExpr (BoolLiteral False)
-                        , LitExpr (IntLiteral 10)])
-                    (LitExpr (StrLiteral "bar"))
-                    (ApplyExpr (LambdaExpr ["x"] (IdentifierExpr "x"))
-                        [ LitExpr (BoolLiteral True) ]))
+            (IfExpr
+                (ApplyExpr (IdentifierExpr "foo")
+                    [ LitExpr (BoolLiteral False)
+                    , LitExpr (IntLiteral 10)])
+                (LitExpr (StrLiteral "bar"))
+                (ApplyExpr (LambdaExpr ["x"] (IdentifierExpr "x"))
+                    [ LitExpr (BoolLiteral True) ]))
             `shouldBe`
                 "if (foo)(false, 10) then\n\t\"bar\"\nelse\n\t(function(x)\n\tx\nend)(true)\nend"
 

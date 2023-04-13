@@ -10,6 +10,7 @@ Renderer
       should render an identifier [✔]
       should render an if expression [✔]
       should render nested if expression [✔]
+      should render let expressions [✔]
       should render an expression application [✔]
       should render a curried expression appplication [✔]
       should render a negation expression [✔]
@@ -51,7 +52,9 @@ Typer
       should type infer (bound) expression application [✔]
       should not unify incorrect type expression application [✔]
       should type infer partially applied curried expression application [✔]
+      should type infer a negate expression [✔]
       should type infer a binary operation expression [✔]
+      should type infer lambda expressions [✔]
 ZenithParser
   Parser
     when parsing whitespace and comments
@@ -92,6 +95,9 @@ ZenithParser
       should parse multiple binary functions [✔]
       should parse if expressions [✔]
       should parse complex if expressions [✔]
+      should parse lambda expressions [✔]
+      should parse lambda expressions with multiple args [✔]
+      should parse complex expressions [✔]
     when parsing types
       should parse primitive types [✔]
       should parse a function type [✔]
@@ -100,10 +106,26 @@ ZenithParser
     when parsing definitions
       should parse a 2 argument function type annotation [✔]
       should parse a basic definition [✔]
+      should parse a data definition [✘]
       should parse multiple definitions [✔]
       should parse multiple complex definitions [✔]
 
-Finished in 0.0383 seconds
-77 examples, 0 failures
-Test suite spec: PASS
+Failures:
+
+  test/ZenithParserSpec.hs:154:13: 
+  1) ZenithParser.Parser, when parsing definitions, should parse a data definition
+       expected: AST {
+                   functions = [DataDefinition "X" [] [ConstructorDefinition "X" [IntT]]]
+                 }
+        but got: AST {
+                   functions = [DataDefinition "X" [] [ConstructorDefinition "X" []]]
+                 }
+
+  To rerun use: --match "/ZenithParser/Parser/when parsing definitions/should parse a data definition/"
+
+Randomized with seed 1704064650
+
+Finished in 0.0386 seconds
+84 examples, 1 failure
+Test suite spec: FAIL
 Test suite logged to: /home/abhash/Projects/HaskellTesting/dist-newstyle/build/x86_64-linux/ghc-8.10.7/Zenith-0.1.0.0/t/spec/test/Zenith-0.1.0.0-spec.log

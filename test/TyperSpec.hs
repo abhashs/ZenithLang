@@ -53,6 +53,12 @@ spec = parallel $ describe "Typer" $ do
                     [LitExpr (IntLiteral 1)])
             `shouldReturn`
             Right (BoolT :-> IntT)
+
+        it "should type infer a negate expression" $
+            testTI (NegateExpr (LitExpr (IntLiteral 1)))
+            `shouldReturn`
+            Right IntT
+
             
         it "should type infer a binary operation expression" $
             testTI (BinExpr Add 
@@ -61,10 +67,10 @@ spec = parallel $ describe "Typer" $ do
             `shouldReturn`
             Right IntT
         
-        -- it "should type infer lambda expressions" $
-        --     testTIWithEnv 
-        --         (Map.singleton "foo" (Scheme [] (IntT :-> IntT)))
-        --         (LambdaExpr ["x"] (ApplyExpr (IdentifierExpr "foo") [IdentifierExpr "x"]))
-        --     `shouldReturn`
-        --     Right IntT
+        it "should type infer lambda expressions" $
+            testTIWithEnv 
+                (Map.singleton "foo" (Scheme [] (IntT :-> IntT)))
+                (LambdaExpr ["x"] (ApplyExpr (IdentifierExpr "foo") [IdentifierExpr "x"]))
+            `shouldReturn`
+            Right (IntT :-> IntT)
             

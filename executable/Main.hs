@@ -10,9 +10,9 @@ import Text.Megaparsec (parse)
 main :: IO ()
 main = putStrLn $ case parse ast "" code of
     Left x -> "Parse error"
-    Right x -> show $ renderAST x
+    Right x -> show $ renderAST $  simplify x
   where
     code =
-        "test :: Number\n" 
+        "test :: Number\n"
         <> "test = if True then\n \tif True then\n \t\t12 \telse\n \t\t13\n else\n \t 1"
 

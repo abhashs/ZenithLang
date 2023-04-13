@@ -66,9 +66,11 @@ indentAfterEndOfLine = void (endOfLine *> some basicSpace)
 anySpacing :: Parser ()
 anySpacing = void . many $ (basicSpace <|> comment <|> voidChar '\n')
 
+-- Optional spacing with ident after any newline
 spacing :: Parser ()
 spacing = void . many $ (basicSpace <|> try indentAfterEndOfLine)
 
+-- Mandatory spacing with an indent required after any newline
 spacing1 :: Parser ()
 spacing1 = void . some $ (basicSpace <|> indentAfterEndOfLine)
 -- spacing = (void (some indentAfterEndOfLine) <|> multipleNewLines) <* basicSpaces
@@ -109,7 +111,8 @@ keyword = void (
     <|> stringParse "let"
     <|> stringParse "if"
     <|> stringParse "then"
-    <|> stringParse "else")
+    <|> stringParse "else"
+    <|> stringParse "data")
 
 -- binFn :: Parser Tex
 -- binFn = stringParse "+" <|> stringParse "-" <|> stringParse "*" <|> stringParse "/"
@@ -157,7 +160,7 @@ identifier = notFollowedBy keyword *> anyIdentifier
 
 
 lowercaseIdentifier :: Parser Text
-lowercaseIdentifier = do
+lowercaseIdentifier = notFollowedBy keyword *> do
     x <- lowerChar <|> char '_'
     xs <- many $ alphaNumChar <|> char '_'
     return $ pack (x:xs)
@@ -348,8 +351,8 @@ caseExpr =
 
 expr :: Parser Expr
 -- expr = ifExpr <|> lambdaExpr <|> binExpr <|> caseExpr
--- expr = ifExpr <|> lambdaExpr <|> binExpr
-expr = ifExpr <|> binExpr
+expr = ifExpr <|> lambdaExpr <|> binExpr
+-- expr = ifExpr <|> binExpr
 
 singleType :: Parser Type
 singleType = fmap TVar lowercaseIdentifier <|> primType <|> parensed typeExpr
@@ -427,7 +430,8 @@ valueDefinition = do
         return $ NameDefinition bindIdentifier patterns body
 
 constructorDefinition :: Parser ConstructorDefinition
-constructorDefinition = liftA2 ConstructorDefinition identifier (many typeArgument)
+constructorDefinition = liftA2 ConstructorDefinition identifier (many (typeArgument <* spacing))
+-- constructorDefinition = liftA2 ConstructorDefinition identifier (sepBy1 typeArgument spacing1)
 
 definition :: Parser Definition
 definition = valueDefinition' <|> dataDefinition <|> typeSynonym
@@ -435,9 +439,9 @@ definition = valueDefinition' <|> dataDefinition <|> typeSynonym
     valueDefinition' = fmap ValueDefinition valueDefinition
     dataDefinition =
         DataDefinition
-            <$> (stringParse "data" *> identifier)
-            <*> many lowercaseIdentifier
-            <*> (char '=' *> sepBy1 constructorDefinition (char '|'))
+            <$> ((stringParse "data" <* spacing1) *> identifier <* spacing1)
+            <*> many (lowercaseIdentifier <* spacing1)
+            <*> (char '=' *> spacing1 *> sepBy1 constructorDefinition (char '|' <* spacing1))
     typeSynonym = liftA2 TypeSynonym
         (stringParse "type" *> identifier) (char '=' *> typeExpr)
 
@@ -452,4 +456,5 @@ ast = fmap (\d -> AST {
 
 -- spaceOrComment :: Parser ()
 -- spaceOrComment = L.space space1 (L.skipLineComment $ pack "--") (L.skipBlockComment (pack "{-") (pack "-}"))
+
 

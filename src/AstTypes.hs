@@ -60,7 +60,6 @@ data Type
 --     deriving (Eq, Show)
 
 
-
 data Definition
     = ValueDefinition ValueDefinition
     | DataDefinition Text [Text] [ConstructorDefinition]

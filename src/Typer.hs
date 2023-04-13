@@ -12,7 +12,7 @@ import Control.Monad.State
 -- import Control.Monad.Error
 
 import qualified Text.PrettyPrint as Pp
-import AstTypes (Type(..), Literal(..), Expr(..))
+import AstTypes (Type(..), Literal(..), Expr(..), Definition(..), ValueDefinition(..))
 
 
 data Scheme = Scheme [Text] Type
@@ -62,6 +62,9 @@ newtype TypeEnv = TypeEnv (Map.Map Text Scheme)
 
 remove :: TypeEnv -> Text -> TypeEnv
 remove (TypeEnv env) var = TypeEnv (Map.delete var env)
+
+-- member ::  -> Text -> Bool
+-- member (TypeEnv env) n = n `Map.member` env
 
 instance Types TypeEnv where
     freeTypeVariables (TypeEnv env) = freeTypeVariables (Map.elems env)
@@ -140,8 +143,13 @@ typeInfer (TypeEnv env) (IdentifierExpr n) =
       Just sigma -> do t <- instantiate sigma
                        return (nullSubst, t)
 typeInfer _ (LitExpr l) = inferLiteral l
--- TODO: EAbs?
-
+typeInfer env (LambdaExpr args e) =
+  do
+    tv <- newTyVar "a"
+    let TypeEnv env' = remove env (head args)
+        env'' = TypeEnv (env' `Map.union` Map.singleton (head args) (Scheme [] tv))
+    (s1, t1) <- typeInfer env'' e
+    return (s1, apply s1 tv :-> t1)
 typeInfer env exp@(ApplyExpr e1 e2) =
   do
     tv <- newTyVar "a"
@@ -151,7 +159,14 @@ typeInfer env exp@(ApplyExpr e1 e2) =
     return (s3 `composeSubst` s2 `composeSubst` s1, apply s3 tv)
   `catchError`
   (\e -> throwError $ e <> "\n in " <> pack (show exp))
-
+typeInfer env exp@(NegateExpr e) =
+  do
+    tv <- newTyVar "a"
+    (s1, t1) <- typeInfer env e
+    s2 <- mgu t1 IntT
+    return (s2, t1)
+  `catchError`
+  (\e -> throwError $ e <> "\n in " <> pack (show exp))
 typeInfer env exp@(BinExpr op e1 e2) =
   do
     tv <- newTyVar "a"
@@ -162,30 +177,31 @@ typeInfer env exp@(BinExpr op e1 e2) =
   `catchError`
   (\e -> throwError $ e <> "\n in " <> pack (show exp))
 
--- typeInfer env exp@(LambdaExpr args e) =
---   do
---     let env' = foldl remove env args
---     (s1, t1) <- typeInfer env' e
---     let t' = generalize (apply s1 env') t1
---         env'' = TypeEnv (Map.insert (head args) t' env')
 
---     return (s1, t1)
+bindType :: Map.Map Text Scheme -> Type -> Text -> Either Text TypeEnv
+bindType env t n =
+    if n `Map.member` env
+        then Left ("Error: Cannot rebind type for " <> n)
+        else Right (TypeEnv (env `Map.union` Map.singleton n (Scheme [] t)))
 
--- typeInfer env exp@(LambdaExpr args e) =
---   do
---     (s1, t1) <- typeInfer env e
---     let TypeEnv env' = foldl remove env args
---         t' = generalize (apply s1 env) t1
---         env'' = TypeEnv (Map.insert (head args) t' env')
---     (s2, t2) <-  ti (apply s1 env'') e2
+  -- let TypeEnv env' = remove env n in
+  --   TypeEnv (env' `Map.union` Map.singleton n (Scheme [] t))
 
-        -- t' = generalize (apply s1 env) t1
-        -- env'' = TypeEnv (Map.insert 
 
--- typeInfer env exp@(IfExpr b c1 c2) =
---   do
---     tv <- newTyVar "a"
---     (s1, t1) <- typeInfer env b
+typeCheck :: TypeEnv -> Definition -> Either Text TypeEnv
+typeCheck (TypeEnv env) d = case d of
+    ValueDefinition vd -> case vd of
+        TypeAnnotation n t -> bindType env t n
+        NameDefinition n args e -> case n `Map.lookup` env of
+            Just (Scheme ns t) -> ns
+            Nothing -> bindType env (typeInfer env e) n
+
+
+        -- if n `Map.member` env
+        --     then case n `Map.lookup` env of
+        --         Maybe 
+                
+        --     else typeInfer env e
 
 
 
